@@ -1,6 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./model-admin/ModelObject":[function(require,module,exports){
-module.exports=require('SEkqxX');
-},{}],2:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var process=require("__browserify_process");if (!process.EventEmitter) process.EventEmitter = function () {};
 
 var EventEmitter = exports.EventEmitter = process.EventEmitter;
@@ -196,7 +194,7 @@ EventEmitter.listenerCount = function(emitter, type) {
   return ret;
 };
 
-},{"__browserify_process":4}],3:[function(require,module,exports){
+},{"__browserify_process":3}],2:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -543,7 +541,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":2}],4:[function(require,module,exports){
+},{"events":1}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -597,6 +595,8 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
+},{}],"./model-admin/ModelObject":[function(require,module,exports){
+module.exports=require('SEkqxX');
 },{}],5:[function(require,module,exports){
 var ModelObject = require ('./model-admin/ModelObject');
 
@@ -609,10 +609,20 @@ var polluted = function () {
 
 module.exports = polluted;
 
-},{"./model-admin/ModelObject":"SEkqxX"}],"SEkqxX":[function(require,module,exports){
+},{"./model-admin/ModelObject":"SEkqxX"}],6:[function(require,module,exports){
+var Attribute = function (attribute, type) {
+    this.attribute = attribute;
+    this.type = type;
+};
+
+module.exports = Attribute;
+
+},{}],"SEkqxX":[function(require,module,exports){
+var Attribute = require ("./Attribute");
+var Relationship = require ("./Relationship");
+var ModelObjectEvents = require("./ModelObjectEvents");
 var util = require("util");
 var events = require("events");
-var ModelObjectEvents = require("./ModelObjectEvents");
 
 var ModelObject = function (modelName) {
     if (typeof modelName === 'undefined') {
@@ -621,8 +631,8 @@ var ModelObject = function (modelName) {
 
     this.name = modelName;
 
-    var attributes = {};
-    var relationships = {};
+    var attributes = [];
+    var relationships = [];
 
     this.getAttributes = function () {
         return attributes;
@@ -636,35 +646,67 @@ var ModelObject = function (modelName) {
 util.inherits(ModelObject, events.EventEmitter);
 
 ModelObject.prototype.addAttribute = function (attribute, type) {
-    this.getAttributes()[attribute] = type;
-    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, { attribute:type } );
-    console.log('wee');
+    var attributeArr = this.getAttributes();
+
+    //Check if attribute is taken
+    for (var i = 0; i < attributeArr.length; i++) {
+        if (attributeArr[i].attribute === attribute) {
+            throw new Error("Attribute name already taken.");
+        }
+    }
+
+    var newAttribute = new Attribute (attribute, type);
+    attributeArr.push(newAttribute);
+    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, newAttribute );
 };
 
-ModelObject.prototype.removeAttribute = function(name) {
-    var attibutes = this.getAttributes();
-    var attributeObject = { name : attribute[name] };
+ModelObject.prototype.removeAttribute = function(model) {
+    var attributeArr = this.getAttributes();
 
-    delete attributes[name];
+    for (var i = 0; i < attributeArr.length; i++) {
+        if (attributeArr[i].model === model) {
+            attributeObject = attributeArr.splice(i, 1)[0];
+        } else {
+            throw new Error("Attribute is non existent.");
+        }
+    }
+
     this.emit(ModelObjectEvents.ATTRIBUTE_REMOVED, attributeObject);
 };
 
 ModelObject.prototype.addRelationShip = function (model, type) {
-    this.getRelationships()[model] = type;
-    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, { model:type });
+    var relationshipArr = this.getRelationships();
+
+    //Check if relatioship is taken
+    for (var i = 0; i < relationshipArr.length; i++) {
+        if (relationshipArr[i].model === model) {
+            throw new Error("Model name already taken.");
+        }
+    }
+
+    var newRelationship = new Relationship (model, type);
+    relationshipArr.push(newRelationship);
+    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, newRelationship);
 };
 
 ModelObject.prototype.removeRelationShip = function (model) {
-    var relationships = this.getRelationships();
-    var relationshipObject = { model : relationships[model] };
+    var relationshipArr = this.getRelationships();
+    var relationshipObject;
 
-    delete relationships[model];
-    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshipObject);
+    for (var i = 0; i < relationshipArr.length; i++) {
+        if (relationshipArr[i].model === model) {
+            relationshipObject = relationshipArr.splice(i, 1)[0];
+        } else {
+            throw new Error("Relationship is non existent.");
+        }
+    }
+
+    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshObject);
 };
 
 module.exports = ModelObject;
 
-},{"./ModelObjectEvents":7,"events":2,"util":3}],7:[function(require,module,exports){
+},{"./Attribute":6,"./ModelObjectEvents":8,"./Relationship":9,"events":1,"util":2}],8:[function(require,module,exports){
 var ModelObjectEvents = {
     ATTRIBUTE_ADDED : 'attributeAdded',
     ATTRIBUTE_REMOVED : 'attributeRemoved',
@@ -673,6 +715,14 @@ var ModelObjectEvents = {
 };
 
 module.exports = ModelObjectEvents;
+
+},{}],9:[function(require,module,exports){
+var Relationship = function (model, type) {
+    this.model = model;
+    this.type = type;
+};
+
+module.exports = Relationship;
 
 },{}]},{},[5])
 ;

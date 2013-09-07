@@ -1,6 +1,8 @@
+var Attribute = require ("./Attribute");
+var Relationship = require ("./Relationship");
+var ModelObjectEvents = require("./ModelObjectEvents");
 var util = require("util");
 var events = require("events");
-var ModelObjectEvents = require("./ModelObjectEvents");
 
 var ModelObject = function (modelName) {
     if (typeof modelName === 'undefined') {
@@ -9,8 +11,8 @@ var ModelObject = function (modelName) {
 
     this.name = modelName;
 
-    var attributes = {};
-    var relationships = {};
+    var attributes = [];
+    var relationships = [];
 
     this.getAttributes = function () {
         return attributes;
@@ -24,30 +26,62 @@ var ModelObject = function (modelName) {
 util.inherits(ModelObject, events.EventEmitter);
 
 ModelObject.prototype.addAttribute = function (attribute, type) {
-    this.getAttributes()[attribute] = type;
-    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, { attribute:type } );
-    console.log('wee');
+    var attributeArr = this.getAttributes();
+
+    //Check if attribute is taken
+    for (var i = 0; i < attributeArr.length; i++) {
+        if (attributeArr[i].attribute === attribute) {
+            throw new Error("Attribute name already taken.");
+        }
+    }
+
+    var newAttribute = new Attribute (attribute, type);
+    attributeArr.push(newAttribute);
+    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, newAttribute );
 };
 
-ModelObject.prototype.removeAttribute = function(name) {
-    var attibutes = this.getAttributes();
-    var attributeObject = { name : attribute[name] };
+ModelObject.prototype.removeAttribute = function(attribute) {
+    var attributeArr = this.getAttributes();
 
-    delete attributes[name];
+    for (var i = 0; i < attributeArr.length; i++) {
+        if (attributeArr[i].attribute === attribute) {
+            attributeObject = attributeArr.splice(i, 1)[0];
+        } else {
+            throw new Error("Attribute is non existent.");
+        }
+    }
+
     this.emit(ModelObjectEvents.ATTRIBUTE_REMOVED, attributeObject);
 };
 
 ModelObject.prototype.addRelationShip = function (model, type) {
-    this.getRelationships()[model] = type;
-    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, { model:type });
+    var relationshipArr = this.getRelationships();
+
+    //Check if relatioship is taken
+    for (var i = 0; i < relationshipArr.length; i++) {
+        if (relationshipArr[i].model === model) {
+            throw new Error("Model name already taken.");
+        }
+    }
+
+    var newRelationship = new Relationship (model, type);
+    relationshipArr.push(newRelationship);
+    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, newRelationship);
 };
 
 ModelObject.prototype.removeRelationShip = function (model) {
-    var relationships = this.getRelationships();
-    var relationshipObject = { model : relationships[model] };
+    var relationshipArr = this.getRelationships();
+    var relationshipObject;
 
-    delete relationships[model];
-    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshipObject);
+    for (var i = 0; i < relationshipArr.length; i++) {
+        if (relationshipArr[i].model === model) {
+            relationshipObject = relationshipArr.splice(i, 1)[0];
+        } else {
+            throw new Error("Relationship is non existent.");
+        }
+    }
+
+    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshObject);
 };
 
 module.exports = ModelObject;
