@@ -1,6 +1,6 @@
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
-var ModelAdminEvents = require("./ModelAdminEvents");
+var ModelObjectEvents = require("./ModelObjectEvents");
 var util = require("util");
 var events = require("events");
 
@@ -37,7 +37,7 @@ ModelObject.prototype.addAttribute = function (attribute, type) {
 
     var newAttribute = new Attribute (attribute, type);
     attributeArr.push(newAttribute);
-    this.emit(ModelAdminEvents.ATTRIBUTE_ADDED, newAttribute );
+    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, newAttribute );
 };
 
 ModelObject.prototype.removeAttribute = function(attribute) {
@@ -55,7 +55,7 @@ ModelObject.prototype.removeAttribute = function(attribute) {
         throw new Error("Attribute is non existent.");
     }
 
-    this.emit(ModelAdminEvents.ATTRIBUTE_REMOVED, attributeObject);
+    this.emit(ModelObjectEvents.ATTRIBUTE_REMOVED, attributeObject);
 };
 
 ModelObject.prototype.addRelationShip = function (model, type) {
@@ -70,7 +70,7 @@ ModelObject.prototype.addRelationShip = function (model, type) {
 
     var newRelationship = new Relationship (model, type);
     relationshipArr.push(newRelationship);
-    this.emit(ModelAdminEvents.RELATIONSHIP_ADDED, newRelationship);
+    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, newRelationship);
 };
 
 ModelObject.prototype.removeRelationShip = function (model) {
@@ -89,7 +89,7 @@ ModelObject.prototype.removeRelationShip = function (model) {
         throw new Error("Relationship is non existent.");
     }
 
-    this.emit(ModelAdminEvents.RELATIONSHIP_REMOVED, relationshObject);
+    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshObject);
 };
 
 module.exports = ModelObject;
