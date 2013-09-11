@@ -1,3 +1,3 @@
-test:
-	browserify -r ./model-admin/ModelObject entry.js -o model-admin.js
-	open index.html
+client:
+	browserify -r ./lib/ModelAdmin.js client.js -o model-admin.js
+	open test.html

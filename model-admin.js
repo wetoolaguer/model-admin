@@ -595,21 +595,10 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],"./model-admin/ModelObject":[function(require,module,exports){
-module.exports=require('o+Q9Wf');
-},{}],5:[function(require,module,exports){
-var ModelObject = require ('./model-admin/ModelObject');
+},{}],4:[function(require,module,exports){
+var ModelAdmin = require ('./lib/ModelAdmin.js');
 
-var mod = new ModelObject('weto');
-mod.addAttribute();
-
-var polluted = function () {
-    console.log('polluted');
-};
-
-module.exports = polluted;
-
-},{"./model-admin/ModelObject":"o+Q9Wf"}],6:[function(require,module,exports){
+},{"./lib/ModelAdmin.js":"IKm1+o"}],5:[function(require,module,exports){
 var Attribute = function (attribute, type) {
     this.attribute = attribute;
     this.type = type;
@@ -617,23 +606,92 @@ var Attribute = function (attribute, type) {
 
 module.exports = Attribute;
 
-},{}],7:[function(require,module,exports){
+},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
+module.exports=require('IKm1+o');
+},{}],"IKm1+o":[function(require,module,exports){
+var ModelObject = require ('./ModelObject');
+var ModelAdminEvents = require ('./ModelAdminEvents');
+var util = require("util");
+var events = require("events");
+
+var ModelAdmin = function (adminId) {
+    var id = adminId;
+    var modelPool = [];
+
+    this.getModelPool = function () {
+        return modelPool;
+    };
+
+    this.getId = function () {
+        return id;
+    };
+};
+
+util.inherits(ModelAdmin, events.EventEmitter);
+
+ModelAdmin.prototype.createModel = function (name) {
+    var modelPool = this.getModelPool();
+
+    //Check if the model name is already taken
+    for (var i = 0; i < modelPool.length; i++) {
+        if (modelPool[i].name === name) {
+            throw new Error ("Model Name is already taken.");
+        }
+    }
+
+    var newModel = new ModelObject (name);
+    modelPool.push (newModel);
+    this.emit(ModelAdminEvents.MODEL_CREATED, newModel);
+
+    return newModel;
+};
+
+ModelAdmin.prototype.getModel = function (name) {
+    var modelPool = this.getModelPool();
+
+    for (var i = 0; i < modelPool.length; i++) {
+        if (modelPool[i].name === name) {
+            return modelPool[i];
+        }
+    }
+
+    //throw error if nothing is found
+    throw new Error("Model is non existent.");
+};
+
+ModelAdmin.prototype.deleteModel = function (name) {
+    var modelPool = this.getModelPool();
+    var succeeded = false;
+
+    for (var i = 0; i < modelPool.length; i++) {
+        if (modelPool[i].name === name) {
+            modelObject = modelPool.splice(i,1)[0];
+            succeeded = true;
+        }
+    }
+
+    if (!succeeded) {
+        throw new Error ("Model is non existent.");
+    }
+
+    this.emit(ModelAdminEvents.MODEL_DELETED, modelObject);
+};
+
+module.exports = ModelAdmin;
+
+},{"./ModelAdminEvents":8,"./ModelObject":9,"events":1,"util":2}],8:[function(require,module,exports){
 var ModelAdminEvents = {
     MODEL_CREATED : 'modelCreated',
     MODEL_MODIFIED :'modelModified',
     MODEL_DELETED : 'modelDeleted',
-    ATTRIBUTE_ADDED : 'attributeAdded',
-    ATTRIBUTE_REMOVED : 'attributeRemoved',
-    RELATIONSHIP_ADDED : 'relationshipAdded',
-    RELATIONSHIP_REMOVED: 'relationshipRemoved'
 };
 
 module.exports = ModelAdminEvents;
 
-},{}],"o+Q9Wf":[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
-var ModelAdminEvents = require("./ModelAdminEvents");
+var ModelObjectEvents = require("./ModelObjectEvents");
 var util = require("util");
 var events = require("events");
 
@@ -670,7 +728,7 @@ ModelObject.prototype.addAttribute = function (attribute, type) {
 
     var newAttribute = new Attribute (attribute, type);
     attributeArr.push(newAttribute);
-    this.emit(ModelAdminEvents.ATTRIBUTE_ADDED, newAttribute );
+    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, newAttribute );
 };
 
 ModelObject.prototype.removeAttribute = function(attribute) {
@@ -688,7 +746,7 @@ ModelObject.prototype.removeAttribute = function(attribute) {
         throw new Error("Attribute is non existent.");
     }
 
-    this.emit(ModelAdminEvents.ATTRIBUTE_REMOVED, attributeObject);
+    this.emit(ModelObjectEvents.ATTRIBUTE_REMOVED, attributeObject);
 };
 
 ModelObject.prototype.addRelationShip = function (model, type) {
@@ -703,7 +761,7 @@ ModelObject.prototype.addRelationShip = function (model, type) {
 
     var newRelationship = new Relationship (model, type);
     relationshipArr.push(newRelationship);
-    this.emit(ModelAdminEvents.RELATIONSHIP_ADDED, newRelationship);
+    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, newRelationship);
 };
 
 ModelObject.prototype.removeRelationShip = function (model) {
@@ -722,12 +780,22 @@ ModelObject.prototype.removeRelationShip = function (model) {
         throw new Error("Relationship is non existent.");
     }
 
-    this.emit(ModelAdminEvents.RELATIONSHIP_REMOVED, relationshObject);
+    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshObject);
 };
 
 module.exports = ModelObject;
 
-},{"./Attribute":6,"./ModelAdminEvents":7,"./Relationship":9,"events":1,"util":2}],9:[function(require,module,exports){
+},{"./Attribute":5,"./ModelObjectEvents":10,"./Relationship":11,"events":1,"util":2}],10:[function(require,module,exports){
+var ModelObjectEvents = {
+    ATTRIBUTE_ADDED : 'attributeAdded',
+    ATTRIBUTE_REMOVED : 'attributeRemoved',
+    RELATIONSHIP_ADDED : 'relationshipAdded',
+    RELATIONSHIP_REMOVED: 'relationshipRemoved'
+};
+
+module.exports = ModelObjectEvents;
+
+},{}],11:[function(require,module,exports){
 var Relationship = function (model, type) {
     this.model = model;
     this.type = type;
@@ -735,5 +803,5 @@ var Relationship = function (model, type) {
 
 module.exports = Relationship;
 
-},{}]},{},[5])
+},{}]},{},[4])
 ;
