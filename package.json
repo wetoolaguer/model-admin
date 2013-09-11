@@ -1,0 +1,19 @@
+{
+  "name": "model-admin",
+  "version": "0.0.1",
+  "description": "This is model-admin.",
+  "main": "./lib/model-admin",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wetoolaguer/model-admin.git"
+  },
+  "dependencies": {
+  },
+  "author": {
+      "name" : "Weto Olaguer",
+      "email": "wenceslaoolaguer@gmail.com"
+  }
+}
