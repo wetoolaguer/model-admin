@@ -598,8 +598,11 @@ process.chdir = function (dir) {
 },{}],4:[function(require,module,exports){
 var ModelAdmin = require ('./lib/ModelAdmin.js');
 
-},{"./lib/ModelAdmin.js":"IKm1+o"}],5:[function(require,module,exports){
-var Attribute = function (attribute, type) {
+},{"./lib/ModelAdmin.js":"IKm1+o"}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
+module.exports=require('xahVvA');
+},{}],6:[function(require,module,exports){
+var Attribute = function (owner, attribute, type) {
+    this.owner = owner;
     this.attribute = attribute;
     this.type = type;
 };
@@ -615,6 +618,10 @@ var events = require("events");
 var ModelAdmin = function (adminId) {
     var id = adminId;
     var modelPool = [];
+
+    this.getHistorian = function () {
+
+    };
 
     this.getModelPool = function () {
         return modelPool;
@@ -632,7 +639,7 @@ ModelAdmin.prototype.createModel = function (name) {
 
     //Check if the model name is already taken
     for (var i = 0; i < modelPool.length; i++) {
-        if (modelPool[i].name === name) {
+        if (modelPool[i].modelName === name) {
             throw new Error ("Model Name is already taken.");
         }
     }
@@ -648,7 +655,7 @@ ModelAdmin.prototype.getModel = function (name) {
     var modelPool = this.getModelPool();
 
     for (var i = 0; i < modelPool.length; i++) {
-        if (modelPool[i].name === name) {
+        if (modelPool[i].modelName === name) {
             return modelPool[i];
         }
     }
@@ -662,7 +669,7 @@ ModelAdmin.prototype.deleteModel = function (name) {
     var succeeded = false;
 
     for (var i = 0; i < modelPool.length; i++) {
-        if (modelPool[i].name === name) {
+        if (modelPool[i].modelName === name) {
             modelObject = modelPool.splice(i,1)[0];
             succeeded = true;
         }
@@ -679,8 +686,8 @@ module.exports = ModelAdmin;
 
 },{"./ModelAdminEvents":"xahVvA","./ModelObject":11,"events":1,"util":2}],"./lib/ModelObjectEvents.js":[function(require,module,exports){
 module.exports=require('dr+KCb');
-},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
-module.exports=require('xahVvA');
+},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
+module.exports=require('IKm1+o');
 },{}],"xahVvA":[function(require,module,exports){
 var ModelAdminEvents = {
     MODEL_CREATED : 'modelCreated',
@@ -690,8 +697,6 @@ var ModelAdminEvents = {
 
 module.exports = ModelAdminEvents;
 
-},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
-module.exports=require('IKm1+o');
 },{}],11:[function(require,module,exports){
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
@@ -704,7 +709,7 @@ var ModelObject = function (modelName) {
         throw Error (new Error ('Model Name parameter required.'));
     }
 
-    this.name = modelName;
+    this.modelName = modelName;
 
     var attributes = [];
     var relationships = [];
@@ -789,7 +794,7 @@ ModelObject.prototype.removeRelationShip = function (model) {
 
 module.exports = ModelObject;
 
-},{"./Attribute":5,"./ModelObjectEvents":"dr+KCb","./Relationship":13,"events":1,"util":2}],"dr+KCb":[function(require,module,exports){
+},{"./Attribute":6,"./ModelObjectEvents":"dr+KCb","./Relationship":13,"events":1,"util":2}],"dr+KCb":[function(require,module,exports){
 var ModelObjectEvents = {
     ATTRIBUTE_ADDED : 'attributeAdded',
     ATTRIBUTE_REMOVED : 'attributeRemoved',
@@ -800,7 +805,8 @@ var ModelObjectEvents = {
 module.exports = ModelObjectEvents;
 
 },{}],13:[function(require,module,exports){
-var Relationship = function (model, type) {
+var Relationship = function (owner, model, type) {
+    this.owner = owner;
     this.model = model;
     this.type = type;
 };
