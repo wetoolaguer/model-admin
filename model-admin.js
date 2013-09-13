@@ -598,9 +598,7 @@ process.chdir = function (dir) {
 },{}],4:[function(require,module,exports){
 var ModelAdmin = require ('./lib/ModelAdmin.js');
 
-},{"./lib/ModelAdmin.js":"IKm1+o"}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
-module.exports=require('xahVvA');
-},{}],6:[function(require,module,exports){
+},{"./lib/ModelAdmin.js":"IKm1+o"}],5:[function(require,module,exports){
 var Attribute = function (owner, attribute, type) {
     this.owner = owner;
     this.attribute = attribute;
@@ -608,6 +606,27 @@ var Attribute = function (owner, attribute, type) {
 };
 
 module.exports = Attribute;
+
+},{}],"g0LFyV":[function(require,module,exports){
+var HistoryObject = function(id, evnt, obj) {
+    var historyId = id;
+    var event = evnt;
+    var object = obj;
+
+    this.getId = function () {
+        return historyId;
+    };
+
+    this.getEvent = function () {
+        return event;
+    };
+
+    this.getObject = function () {
+        return object;
+    };
+};
+
+module.exports = HistoryObject;
 
 },{}],"IKm1+o":[function(require,module,exports){
 var ModelObject = require ('./ModelObject');
@@ -684,11 +703,7 @@ ModelAdmin.prototype.deleteModel = function (name) {
 
 module.exports = ModelAdmin;
 
-},{"./ModelAdminEvents":"xahVvA","./ModelObject":11,"events":1,"util":2}],"./lib/ModelObjectEvents.js":[function(require,module,exports){
-module.exports=require('dr+KCb');
-},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
-module.exports=require('IKm1+o');
-},{}],"xahVvA":[function(require,module,exports){
+},{"./ModelAdminEvents":"xahVvA","./ModelObject":9,"events":1,"util":2}],"xahVvA":[function(require,module,exports){
 var ModelAdminEvents = {
     MODEL_CREATED : 'modelCreated',
     MODEL_MODIFIED :'modelModified',
@@ -697,7 +712,7 @@ var ModelAdminEvents = {
 
 module.exports = ModelAdminEvents;
 
-},{}],11:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
 var ModelObjectEvents = require("./ModelObjectEvents");
@@ -794,7 +809,7 @@ ModelObject.prototype.removeRelationShip = function (model) {
 
 module.exports = ModelObject;
 
-},{"./Attribute":6,"./ModelObjectEvents":"dr+KCb","./Relationship":13,"events":1,"util":2}],"dr+KCb":[function(require,module,exports){
+},{"./Attribute":5,"./ModelObjectEvents":"dr+KCb","./Relationship":12,"events":1,"util":2}],"dr+KCb":[function(require,module,exports){
 var ModelObjectEvents = {
     ATTRIBUTE_ADDED : 'attributeAdded',
     ATTRIBUTE_REMOVED : 'attributeRemoved',
@@ -804,7 +819,9 @@ var ModelObjectEvents = {
 
 module.exports = ModelObjectEvents;
 
-},{}],13:[function(require,module,exports){
+},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
+module.exports=require('IKm1+o');
+},{}],12:[function(require,module,exports){
 var Relationship = function (owner, model, type) {
     this.owner = owner;
     this.model = model;
@@ -813,5 +830,11 @@ var Relationship = function (owner, model, type) {
 
 module.exports = Relationship;
 
+},{}],"./lib/HistoryObject.js":[function(require,module,exports){
+module.exports=require('g0LFyV');
+},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
+module.exports=require('xahVvA');
+},{}],"./lib/ModelObjectEvents.js":[function(require,module,exports){
+module.exports=require('dr+KCb');
 },{}]},{},[4])
 ;
