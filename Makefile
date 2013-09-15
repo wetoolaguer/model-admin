@@ -1,3 +1,3 @@
 client:
-	browserify -r ./lib/ModelAdmin.js -r ./lib/ModelAdminEvents.js -r ./lib/ModelObjectEvents.js -r ./lib/HistoryObject.js client.js -o model-admin.js
+	browserify -r ./lib/ModelAdmin.js -r ./lib/ModelAdminEvents.js -r ./lib/ModelObjectEvents.js -r ./lib/HistoryWriter.js -r ./lib/HistoryInterpreter.js -r ./lib/Historian.js  client.js -o model-admin.js
 	open test.html
