@@ -194,7 +194,9 @@ EventEmitter.listenerCount = function(emitter, type) {
   return ret;
 };
 
-},{"__browserify_process":3}],2:[function(require,module,exports){
+},{"__browserify_process":4}],"./lib/ModelAdmin.js":[function(require,module,exports){
+module.exports=require('dM8Aoc');
+},{}],3:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -541,7 +543,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":1}],3:[function(require,module,exports){
+},{"events":1}],4:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -595,11 +597,30 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],4:[function(require,module,exports){
+},{}],"./lib/HistoryWriter.js":[function(require,module,exports){
+module.exports=require('juKjgH');
+},{}],6:[function(require,module,exports){
 
-},{}],5:[function(require,module,exports){
-var Attribute = function (owner, attribute, type) {
-    this.owner = owner;
+},{}],"juKjgH":[function(require,module,exports){
+var HistoryWriter = function () {
+};
+
+HistoryWriter.prototype.writeHistory = function (actor, evt, params) {
+    var historyObject = {};
+
+    historyObject.actor = actor;
+    historyObject.eventName = evt;
+    historyObject.eventParams = params;
+
+    return historyObject;
+};
+
+module.exports = HistoryWriter;
+
+},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
+module.exports=require('AuZHws');
+},{}],9:[function(require,module,exports){
+var Attribute = function (attribute, type) {
     this.attribute = attribute;
     this.type = type;
 };
@@ -632,7 +653,6 @@ module.exports = Historian;
 
 },{}],"zklePh":[function(require,module,exports){
 var ModelAdminEvents = require("./ModelAdminEvents");
-var ModelObjectEvents = require ("./ModelObjectEvents");
 
 var HistoryInterpreter = function (modelAdmin) {
     var admin = modelAdmin;
@@ -643,55 +663,40 @@ var HistoryInterpreter = function (modelAdmin) {
 };
 
 var recreateHistory = function (historyObject) {
-    var admin = this.getAdmin();
-    var eventName = historyObject.eventName;
-    var eventParams = historyObject.eventParams;
-    var modelObject;
+    //var admin = this.getAdmin();
+    //var eventName = historyObject.eventName;
+    //var eventParams = historyObject.eventParams;
+    //var modelObject;
 
     //Create history depending on the case
-    if (eventName === ModelAdminEvents.MODEL_CREATED) {
-        admin.createModel(eventParams.modelName);
-    } else if (eventName === ModelAdminEvents.MODEL_DELETED) {
-        admin.deleteModel(eventParams.modelName);
-    } else if (eventName === ModelObjectEvents.ATTRIBUTE_ADDED) {
-        //resolve conflicts later on
-        modelObject = admin.getModel(eventParams.modelName);
-        modelObject.addAttribute(eventParms.attribute, eventParams.type);
-    } else if (eventName === ModelObjectEvents.ATTRIBUTE_REMOVED) {
-        //resolve conflicts later on
-        modelObject = admin.getModel(eventParams.modelName);
-        modelObject.removeAttribute(eventParms.attribute);
-    } else if (eventName === ModelObjectEvents.RELATIONSHIP_ADDED) {
-        //resolve conflicts later on
-        modelObject = admin.getModel(eventParams.modelName);
-        modelObject.addRelationship(eventParams.model, eventParams.type);
-    } else if (eventName === ModelObjectEvents.RELATIONSHIP_REMOVED) {
-        //resolve conflicts later on
-        modelObject = admin.getModel(eventParams.modelName);
-        modelObject.removeRelationship(eventParms.model);
-    } else {
-        throw new Error ("Unknown event!");
-    }
+    //if (eventName === ModelAdminEvents.MODEL_CREATED) {
+        //admin.createModel(eventParams.modelName);
+    //} else if (eventName === ModelAdminEvents.MODEL_DELETED) {
+        //admin.deleteModel(eventParams.modelName);
+    //} else if (eventName === ModelObjectEvents.ATTRIBUTE_ADDED) {
+        ////resolve conflicts later on
+        //modelObject = admin.getModel(eventParams.modelName);
+        //modelObject.addAttribute(eventParms.attribute, eventParams.type);
+    //} else if (eventName === ModelObjectEvents.ATTRIBUTE_REMOVED) {
+        ////resolve conflicts later on
+        //modelObject = admin.getModel(eventParams.modelName);
+        //modelObject.removeAttribute(eventParms.attribute);
+    //} else if (eventName === ModelObjectEvents.RELATIONSHIP_ADDED) {
+        ////resolve conflicts later on
+        //modelObject = admin.getModel(eventParams.modelName);
+        //modelObject.addRelationship(eventParams.model, eventParams.type);
+    //} else if (eventName === ModelObjectEvents.RELATIONSHIP_REMOVED) {
+        ////resolve conflicts later on
+        //modelObject = admin.getModel(eventParams.modelName);
+        //modelObject.removeRelationship(eventParms.model);
+    //} else {
+        //throw new Error ("Unknown event!");
+    //}
 };
 
 module.exports = HistoryInterpreter;
 
-},{"./ModelAdminEvents":"AuZHws","./ModelObjectEvents":"qk2Phv"}],"juKjgH":[function(require,module,exports){
-var HistoryWriter = function () {
-};
-
-HistoryWriter.prototype.writeHistory = function (evt, params) {
-    var historyObject = {};
-
-    historyObject.eventName = evt;
-    historyObject.eventParams = params;
-
-    return historyObject;
-};
-
-module.exports = HistoryWriter;
-
-},{}],"dM8Aoc":[function(require,module,exports){
+},{"./ModelAdminEvents":"AuZHws"}],"dM8Aoc":[function(require,module,exports){
 var ModelObject = require ('./ModelObject');
 var ModelAdminEvents = require ('./ModelAdminEvents');
 var util = require("util");
@@ -726,7 +731,8 @@ ModelAdmin.prototype.createModel = function (name) {
         }
     }
 
-    var newModel = new ModelObject (name);
+	var newModel = new ModelObject (name);
+
     modelPool.push (newModel);
     this.emit(ModelAdminEvents.MODEL_CREATED, newModel);
 
@@ -762,35 +768,56 @@ ModelAdmin.prototype.deleteModel = function (name) {
     }
 
     this.emit(ModelAdminEvents.MODEL_DELETED, modelObject);
+    return modelObject;
+};
+
+ModelAdmin.prototype.addAttribute = function (modelName, attribute, type) {
+    var model = this.getModel(modelName);
+    var attributeObj = model.addAttribute(attribute, type);
+    this.emit(ModelAdminEvents.ATTRIBUTE_ADDED, attributeObj);
+};
+
+ModelAdmin.prototype.removeAttribute = function (modelName, attribute) {
+    var model = this.getModel(modelName);
+    var attributeObj = model.removeAttribute(attribute);
+    this.emit(ModelAdminEvents.ATTRIBUTE_REMOVED, attributeObj);
+};
+
+ModelAdmin.prototype.addRelationship = function (modelName, withModel, type) {
+    var model = this.getModel(modelName);
+    var relationshipObj = model.addRelationship(withModel, type);
+    this.emit(ModelAdminEvents.RELATIONSHIP_ADDED, relationshipObj);
+};
+
+ModelAdmin.prototype.removeRelationship = function (modelName, withModel) {
+    var model = this.getModel(modelName);
+    var relationshipObj = model.removeRelationship(withModel);
+    this.emit(ModelAdminEvents.RELATIONSHIP_REMOVED, relationshipObj);
 };
 
 module.exports = ModelAdmin;
 
-},{"./ModelAdminEvents":"AuZHws","./ModelObject":11,"events":1,"util":2}],"AuZHws":[function(require,module,exports){
+},{"./ModelAdminEvents":"AuZHws","./ModelObject":14,"events":1,"util":3}],"AuZHws":[function(require,module,exports){
 var ModelAdminEvents = {
     MODEL_CREATED : 'modelCreated',
     MODEL_DELETED : 'modelDeleted',
+    ATTRIBUTE_ADDED: 'modelAtrributeAdded',
+    ATTRIBUTE_REMOVED: 'modelAttributeRemoved',
+    RELATIONSHIP_ADDED: 'modelRelationshipAdded',
+    RELATIONSHIP_REMOVED: 'modelRelationshipRemoved'
 };
 
 module.exports = ModelAdminEvents;
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
-var ModelObjectEvents = require("./ModelObjectEvents");
 var util = require("util");
-var events = require("events");
 
-var ModelObject = function (modelName, byCollaborator) {
+var ModelObject = function (modelName) {
     if (typeof modelName === 'undefined') {
         throw Error (new Error ('Model Name parameter required.'));
     }
-
-	this.byCollaborator = true;
-
-	if (typeof byCollaborator === 'undefined') {
-		this.byCollaborator = false;
-	}
 
     this.modelName = modelName;
 
@@ -806,8 +833,6 @@ var ModelObject = function (modelName, byCollaborator) {
     };
 };
 
-util.inherits(ModelObject, events.EventEmitter);
-
 ModelObject.prototype.addAttribute = function (attribute, type) {
     var attributeArr = this.getAttributes();
 
@@ -820,7 +845,7 @@ ModelObject.prototype.addAttribute = function (attribute, type) {
 
     var newAttribute = new Attribute (attribute, type);
     attributeArr.push(newAttribute);
-    this.emit(ModelObjectEvents.ATTRIBUTE_ADDED, newAttribute );
+    return newAttribute;
 };
 
 ModelObject.prototype.removeAttribute = function(attribute) {
@@ -838,7 +863,7 @@ ModelObject.prototype.removeAttribute = function(attribute) {
         throw new Error("Attribute is non existent.");
     }
 
-    this.emit(ModelObjectEvents.ATTRIBUTE_REMOVED, attributeObject);
+    return attributeObject;
 };
 
 ModelObject.prototype.addRelationship = function (model, type) {
@@ -853,7 +878,7 @@ ModelObject.prototype.addRelationship = function (model, type) {
 
     var newRelationship = new Relationship (model, type);
     relationshipArr.push(newRelationship);
-    this.emit(ModelObjectEvents.RELATIONSHIP_ADDED, newRelationship);
+    return newRelationship;
 };
 
 ModelObject.prototype.removeRelationship = function (model) {
@@ -872,28 +897,13 @@ ModelObject.prototype.removeRelationship = function (model) {
         throw new Error("Relationship is non existent.");
     }
 
-    this.emit(ModelObjectEvents.RELATIONSHIP_REMOVED, relationshObject);
+    return relationshipObject;
 };
 
 module.exports = ModelObject;
 
-},{"./Attribute":5,"./ModelObjectEvents":"qk2Phv","./Relationship":15,"events":1,"util":2}],"qk2Phv":[function(require,module,exports){
-var ModelObjectEvents = {
-    ATTRIBUTE_ADDED : 'attributeAdded',
-    ATTRIBUTE_REMOVED : 'attributeRemoved',
-    RELATIONSHIP_ADDED : 'relationshipAdded',
-    RELATIONSHIP_REMOVED: 'relationshipRemoved'
-};
-
-module.exports = ModelObjectEvents;
-
-},{}],"./lib/Historian.js":[function(require,module,exports){
-module.exports=require('hqu3+/');
-},{}],"./lib/ModelObjectEvents.js":[function(require,module,exports){
-module.exports=require('qk2Phv');
-},{}],15:[function(require,module,exports){
-var Relationship = function (owner, model, type) {
-    this.owner = owner;
+},{"./Attribute":9,"./Relationship":15,"util":3}],15:[function(require,module,exports){
+var Relationship = function (model, type) {
     this.model = model;
     this.type = type;
 };
@@ -913,15 +923,11 @@ var ServerAdminEvents = {
 
 module.exports = ServerAdminEvents;
 
-},{}],"./lib/ServerAdminEvents.js":[function(require,module,exports){
-module.exports=require('WHy8x9');
-},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
-module.exports=require('AuZHws');
 },{}],"./lib/HistoryInterpreter.js":[function(require,module,exports){
 module.exports=require('zklePh');
-},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
-module.exports=require('dM8Aoc');
-},{}],"./lib/HistoryWriter.js":[function(require,module,exports){
-module.exports=require('juKjgH');
-},{}]},{},[4])
+},{}],"./lib/Historian.js":[function(require,module,exports){
+module.exports=require('hqu3+/');
+},{}],"./lib/ServerAdminEvents.js":[function(require,module,exports){
+module.exports=require('WHy8x9');
+},{}]},{},[6])
 ;
