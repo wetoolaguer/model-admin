@@ -194,9 +194,7 @@ EventEmitter.listenerCount = function(emitter, type) {
   return ret;
 };
 
-},{"__browserify_process":4}],"./lib/ModelAdmin.js":[function(require,module,exports){
-module.exports=require('dM8Aoc');
-},{}],3:[function(require,module,exports){
+},{"__browserify_process":3}],2:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -543,7 +541,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":1}],4:[function(require,module,exports){
+},{"events":1}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -597,30 +595,13 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],"./lib/HistoryWriter.js":[function(require,module,exports){
-module.exports=require('juKjgH');
+},{}],"./lib/HistoryInterpreter.js":[function(require,module,exports){
+module.exports=require('zklePh');
+},{}],5:[function(require,module,exports){
+
 },{}],6:[function(require,module,exports){
-
-},{}],"juKjgH":[function(require,module,exports){
-var HistoryWriter = function () {
-};
-
-HistoryWriter.prototype.writeHistory = function (actor, evt, params) {
-    var historyObject = {};
-
-    historyObject.actor = actor;
-    historyObject.eventName = evt;
-    historyObject.eventParams = params;
-
-    return historyObject;
-};
-
-module.exports = HistoryWriter;
-
-},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
-module.exports=require('AuZHws');
-},{}],9:[function(require,module,exports){
-var Attribute = function (attribute, type) {
+var Attribute = function (owner, attribute, type) {
+    this.owner = owner;
     this.attribute = attribute;
     this.type = type;
 };
@@ -696,7 +677,23 @@ var recreateHistory = function (historyObject) {
 
 module.exports = HistoryInterpreter;
 
-},{"./ModelAdminEvents":"AuZHws"}],"dM8Aoc":[function(require,module,exports){
+},{"./ModelAdminEvents":"AuZHws"}],"juKjgH":[function(require,module,exports){
+var HistoryWriter = function () {
+};
+
+HistoryWriter.prototype.writeHistory = function (actor, evt, params) {
+    var historyObject = {};
+
+    historyObject.actor = actor;
+    historyObject.eventName = evt;
+    historyObject.eventParams = params;
+
+    return historyObject;
+};
+
+module.exports = HistoryWriter;
+
+},{}],"dM8Aoc":[function(require,module,exports){
 var ModelObject = require ('./ModelObject');
 var ModelAdminEvents = require ('./ModelAdminEvents');
 var util = require("util");
@@ -797,7 +794,7 @@ ModelAdmin.prototype.removeRelationship = function (modelName, withModel) {
 
 module.exports = ModelAdmin;
 
-},{"./ModelAdminEvents":"AuZHws","./ModelObject":14,"events":1,"util":3}],"AuZHws":[function(require,module,exports){
+},{"./ModelAdminEvents":"AuZHws","./ModelObject":12,"events":1,"util":2}],"AuZHws":[function(require,module,exports){
 var ModelAdminEvents = {
     MODEL_CREATED : 'modelCreated',
     MODEL_DELETED : 'modelDeleted',
@@ -809,7 +806,7 @@ var ModelAdminEvents = {
 
 module.exports = ModelAdminEvents;
 
-},{}],14:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var Attribute = require ("./Attribute");
 var Relationship = require ("./Relationship");
 var util = require("util");
@@ -843,7 +840,7 @@ ModelObject.prototype.addAttribute = function (attribute, type) {
         }
     }
 
-    var newAttribute = new Attribute (attribute, type);
+    var newAttribute = new Attribute (this.modelName, attribute, type);
     attributeArr.push(newAttribute);
     return newAttribute;
 };
@@ -866,28 +863,28 @@ ModelObject.prototype.removeAttribute = function(attribute) {
     return attributeObject;
 };
 
-ModelObject.prototype.addRelationship = function (model, type) {
+ModelObject.prototype.addRelationship = function (withModel, type) {
     var relationshipArr = this.getRelationships();
 
     //Check if relatioship is taken
     for (var i = 0; i < relationshipArr.length; i++) {
-        if (relationshipArr[i].model === model) {
-            throw new Error("Model name already taken.");
+        if (relationshipArr[i].withModel === withModel) {
+            throw new Error("Relationship exists.");
         }
     }
 
-    var newRelationship = new Relationship (model, type);
+    var newRelationship = new Relationship (this.modelName, withModel, type);
     relationshipArr.push(newRelationship);
     return newRelationship;
 };
 
-ModelObject.prototype.removeRelationship = function (model) {
+ModelObject.prototype.removeRelationship = function (withModel) {
     var relationshipArr = this.getRelationships();
     var relationshipObject;
     var succeeded = false;
 
     for (var i = 0; i < relationshipArr.length; i++) {
-        if (relationshipArr[i].model === model) {
+        if (relationshipArr[i].withModel === withModel) {
             relationshipObject = relationshipArr.splice(i, 1)[0];
             succeeded = true;
         }
@@ -902,14 +899,19 @@ ModelObject.prototype.removeRelationship = function (model) {
 
 module.exports = ModelObject;
 
-},{"./Attribute":9,"./Relationship":15,"util":3}],15:[function(require,module,exports){
-var Relationship = function (model, type) {
-    this.model = model;
+},{"./Attribute":6,"./Relationship":13,"util":2}],13:[function(require,module,exports){
+var Relationship = function (owner, withModel, type) {
+    this.owner = owner;
+    this.withModel = withModel;
     this.type = type;
 };
 
 module.exports = Relationship;
 
+},{}],"./lib/Historian.js":[function(require,module,exports){
+module.exports=require('hqu3+/');
+},{}],"./lib/ServerAdminEvents.js":[function(require,module,exports){
+module.exports=require('WHy8x9');
 },{}],"WHy8x9":[function(require,module,exports){
 var ServerAdminEvents = {
     MODEL_CREATED : 'serverModelCreated',
@@ -923,11 +925,11 @@ var ServerAdminEvents = {
 
 module.exports = ServerAdminEvents;
 
-},{}],"./lib/HistoryInterpreter.js":[function(require,module,exports){
-module.exports=require('zklePh');
-},{}],"./lib/Historian.js":[function(require,module,exports){
-module.exports=require('hqu3+/');
-},{}],"./lib/ServerAdminEvents.js":[function(require,module,exports){
-module.exports=require('WHy8x9');
-},{}]},{},[6])
+},{}],"./lib/ModelAdminEvents.js":[function(require,module,exports){
+module.exports=require('AuZHws');
+},{}],"./lib/HistoryWriter.js":[function(require,module,exports){
+module.exports=require('juKjgH');
+},{}],"./lib/ModelAdmin.js":[function(require,module,exports){
+module.exports=require('dM8Aoc');
+},{}]},{},[5])
 ;
