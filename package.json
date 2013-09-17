@@ -10,7 +10,7 @@
     "url": "https://github.com/wetoolaguer/model-admin.git"
   },
   "dependencies": {
-
+     "mocha" : "*"
   },
   "author": {
       "name" : "Weto Olaguer",
